@@ -1,0 +1,32 @@
+﻿<Window x:Class="ChangeLayoutStyle.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ChangeLayoutStyle"
+        mc:Ignorable="d"
+        Title="Изменить оформление" MinHeight="338" Height="338" Width="336" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <Label Content="Папка с файлами" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBox x:Name="tb_folderDir" MinWidth="120" Height="25" Margin="10,3" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch"/>
+            <Button x:Name="b_folderDir" Content="Выбрать папку" Padding="3" Margin="3" HorizontalAlignment="Center" Click="Button_Click"/>
+            <Label Content="Файл оформления .lyt" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBox x:Name="tb_layoutLibraryFileName" MinWidth="120" Height="25" Margin="10,3" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch"/>
+            <Button x:Name="b_layoutLibraryFileName" Content="Выбрать файл lyt" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_layoutLibraryFileName_Click"/>
+            <Label Content = "Номер оформления" Padding="3"  Margin="3" HorizontalAlignment="Center"/>
+            <TextBox x:Name="tb_LayoutStyleNumber" Padding="3"  Margin="3" Width="80" HorizontalContentAlignment="Center"/>
+            <Button x:Name="b_change" Content="Изменить оформление" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_change_Click"/>
+        </StackPanel>
+        <StatusBar x:Name="sb_info" Grid.Row="1">
+            <StatusBarItem>
+                <TextBlock x:Name="tb_finish"/>
+            </StatusBarItem>
+        </StatusBar>
+
+    </Grid>
+</Window>
