@@ -1,12 +1,12 @@
 ﻿using ChangeLayoutStyle.Properties;
 using Kompas6API5;
 using KompasAPI7;
-using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using System.Windows.Forms;
 
 namespace ChangeLayoutStyle
 {
@@ -26,13 +26,16 @@ namespace ChangeLayoutStyle
             #endregion
         }
 
+        public List<string> Log { get => _log; set => _log = value; }
 
-        private void ChangeLayout(IKompasDocument kompasDocument)
+        private List<string> _log = new List<string>();
+
+        private bool ChangeLayout(IKompasDocument kompasDocument)
         {
             if (kompasDocument is null)
             {
                 tb_finish.Text = "Не получилось открыть документ";
-                return;
+                return false;
             }
             
             ILayoutSheets layoutSheets = kompasDocument.LayoutSheets;
@@ -54,8 +57,14 @@ namespace ChangeLayoutStyle
                 layoutSheet.LayoutStyleNumber = Convert.ToDouble(tb_LayoutStyleNumber.Text);
             }
             layoutSheet.Update();
+            kompasDocument.Save();
+            if (kompasDocument.Changed)
+            {
+                kompasDocument.Close(Kompas6Constants.DocumentCloseOptions.kdDoNotSaveChanges);
+                return false;
+            }
             kompasDocument.Close(Kompas6Constants.DocumentCloseOptions.kdSaveChanges);
-
+            return true;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -85,7 +94,7 @@ namespace ChangeLayoutStyle
 
         private void b_change_Click(object sender, RoutedEventArgs e)
         {
-            tb_finish.Text = "";
+            Log.Clear();
             if (!Directory.Exists(tb_folderDir.Text))
             {
                 tb_finish.Text = "Путь к папке  с файлами не корректен.";
@@ -118,11 +127,28 @@ namespace ChangeLayoutStyle
             }
             foreach (string item in FilesDirs)
             {
-                ChangeLayout(documets.Open(item, false, false));
+                IKompasDocument kompasDocument = documets.Open(item, false, false);
+                if (!ChangeLayout(kompasDocument))
+                {
+                    Log.Add(item);
+                }
+                
             }
             application.Quit();
-
-            tb_finish.Text = "Готово";
+            if (Log.Count == 0)
+            {
+                tb_finish.Text = "Готово";
+                return;
+            }
+            using (StreamWriter sw = new StreamWriter("Log.txt",false))
+            {
+                foreach (var item in Log)
+                {
+                    sw.WriteLine(item);
+                }
+                sw.Close();
+            }
+            tb_finish.Text = "Готово. Часть файлов не была изменена, просмотрите журнал.";
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -133,6 +159,19 @@ namespace ChangeLayoutStyle
             Settings.Default.isDirs = (bool)cb_dirs.IsChecked;
             Settings.Default.Save();
             #endregion
+        }
+
+        private void b_log_Click(object sender, RoutedEventArgs e)
+        {
+            if (File.Exists("Log.txt"))
+            {
+                Process.Start("Log.txt");
+            }
+            else
+            {
+                tb_finish.Text = "Файл журнала не найден.";
+            }
+            
         }
     }
 }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChangeLayoutStyle"
         mc:Ignorable="d"
-        Title="Изменить оформление" MinHeight="355" Height="355" Width="336" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
+        Title="Изменить оформление" MinHeight="380" Height="400" Width="370" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -22,6 +22,7 @@
             <Label Content = "Номер оформления" Padding="3"  Margin="3" HorizontalAlignment="Center"/>
             <TextBox x:Name="tb_LayoutStyleNumber" Padding="3"  Margin="3" Width="80" HorizontalContentAlignment="Center"/>
             <Button x:Name="b_change" Content="Изменить оформление" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_change_Click"/>
+            <Button x:Name="b_log" Content="Журнал"  Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_log_Click"/>
         </StackPanel>
         <StatusBar x:Name="sb_info" Grid.Row="1">
             <StatusBarItem>
