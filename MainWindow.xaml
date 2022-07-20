@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChangeLayoutStyle"
         mc:Ignorable="d"
-        Title="Изменить оформление" MinHeight="338" Height="338" Width="336" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
+        Title="Изменить оформление" MinHeight="355" Height="355" Width="336" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -14,7 +14,8 @@
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <Label Content="Папка с файлами" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <TextBox x:Name="tb_folderDir" MinWidth="120" Height="25" Margin="10,3" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch"/>
-            <Button x:Name="b_folderDir" Content="Выбрать папку" Padding="3" Margin="3" HorizontalAlignment="Center" Click="Button_Click"/>
+            <CheckBox x:Name="cb_dirs" Content="С подпапками" Margin="3" HorizontalAlignment="Center"/>
+            <Button x:Name="b_folderDir" Content="Выбрать папку"  Padding="3" Margin="3" HorizontalAlignment="Center" Click="Button_Click"/>
             <Label Content="Файл оформления .lyt" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <TextBox x:Name="tb_layoutLibraryFileName" MinWidth="120" Height="25" Margin="10,3" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch"/>
             <Button x:Name="b_layoutLibraryFileName" Content="Выбрать файл lyt" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_layoutLibraryFileName_Click"/>

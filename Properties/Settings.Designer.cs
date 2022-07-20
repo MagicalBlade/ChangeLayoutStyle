@@ -46,5 +46,17 @@ namespace ChangeLayoutStyle.Properties {
                 this["LayoutLibraryFileName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool isDirs {
+            get {
+                return ((bool)(this["isDirs"]));
+            }
+            set {
+                this["isDirs"] = value;
+            }
+        }
     }
 }

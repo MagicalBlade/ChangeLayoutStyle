@@ -6,6 +6,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace ChangeLayoutStyle
 {
@@ -21,6 +22,7 @@ namespace ChangeLayoutStyle
             #region Загрузка настроек
             tb_folderDir.Text = Settings.Default.FolderDir;
             tb_layoutLibraryFileName.Text = Settings.Default.LayoutLibraryFileName;
+            cb_dirs.IsChecked = Settings.Default.isDirs;
             #endregion
         }
 
@@ -105,9 +107,15 @@ namespace ChangeLayoutStyle
 
             IApplication application = (IApplication)kompas.ksGetApplication7();
             IDocuments documets = application.Documents;
-
-
-            string[]  FilesDirs = Directory.GetFiles(tb_folderDir.Text, "*.cdw");
+            string[] FilesDirs = new string[0];
+            if (cb_dirs.IsChecked == true)
+            {
+                FilesDirs = Directory.GetFiles(tb_folderDir.Text, "*.cdw", SearchOption.AllDirectories);
+            }
+            else
+            {
+                FilesDirs = Directory.GetFiles(tb_folderDir.Text, "*.cdw");
+            }
             foreach (string item in FilesDirs)
             {
                 ChangeLayout(documets.Open(item, false, false));
@@ -122,6 +130,7 @@ namespace ChangeLayoutStyle
             #region Сохранение настроек
             Settings.Default.FolderDir = tb_folderDir.Text;
             Settings.Default.LayoutLibraryFileName = tb_layoutLibraryFileName.Text;
+            Settings.Default.isDirs = (bool)cb_dirs.IsChecked;
             Settings.Default.Save();
             #endregion
         }
