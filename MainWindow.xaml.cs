@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace ChangeLayoutStyle
@@ -30,47 +31,56 @@ namespace ChangeLayoutStyle
 
         private List<string> _log = new List<string>();
 
-        private bool ChangeLayout(IKompasDocument kompasDocument)
+        private async Task ChangeLayout(string[] FilesDirs, string layoutLibraryFileName, string layoutStyleNumber, IProgress<int> progress)
         {
-            if (kompasDocument is null)
+            progress.Report(10);
+            Type kompasType = Type.GetTypeFromProgID("KOMPAS.Application.5", true);
+            KompasObject kompas = Activator.CreateInstance(kompasType) as KompasObject; //Запуск компаса
+            kompas.Visible = false;
+            int progressCount = 20;
+            progress.Report(progressCount);
+            IApplication application = (IApplication)kompas.ksGetApplication7();
+            IDocuments documets = application.Documents;
+            foreach (string item in FilesDirs)
             {
-                tb_finish.Text = "Не получилось открыть документ";
-                return false;
+                IKompasDocument kompasDocument = documets.Open(item, false, false);
+                if (kompasDocument is null)
+                {
+                    Log.Add($"{item} - Не получилось открыть документ");
+                    break;
+                }
+
+                ILayoutSheets layoutSheets = kompasDocument.LayoutSheets;
+                if (layoutSheets.Count == 0)
+                {
+                    Log.Add($"{item} - Листов нет");
+                    break;
+                }
+                ILayoutSheet layoutSheet = null;
+                foreach (ILayoutSheet item1 in layoutSheets)
+                {
+                    layoutSheet = item1;
+                    break;
+                }
+                if (layoutSheet == null)
+                {
+                    Log.Add(item);
+                }
+                layoutSheet.LayoutLibraryFileName = layoutLibraryFileName;
+                layoutSheet.LayoutStyleNumber = Convert.ToDouble(layoutStyleNumber);
+                layoutSheet.Update();
+                kompasDocument.Save();
+                if (kompasDocument.Changed)
+                {
+                    kompasDocument.Close(Kompas6Constants.DocumentCloseOptions.kdDoNotSaveChanges);
+                    Log.Add($"{item} - не сохранен");
+                }
+                kompasDocument.Close(Kompas6Constants.DocumentCloseOptions.kdSaveChanges);
+                progressCount += 80 / FilesDirs.Length;
+                progress.Report(progressCount);
             }
-            
-            ILayoutSheets layoutSheets = kompasDocument.LayoutSheets;
-            if (layoutSheets.Count == 0)
-            {
-                tb_finish.Text = "Листов нет";
-                return false;
-            }
-            ILayoutSheet layoutSheet = null;
-            foreach (ILayoutSheet item in layoutSheets)
-            {
-                layoutSheet = item;
-                break;
-            }
-            if (layoutSheet == null)
-            {
-                return false;
-            }
-            if (tb_layoutLibraryFileName.Text != "")
-            {
-                layoutSheet.LayoutLibraryFileName = tb_layoutLibraryFileName.Text;
-            }
-            if (tb_LayoutStyleNumber.Text != "")
-            {
-                layoutSheet.LayoutStyleNumber = Convert.ToDouble(tb_LayoutStyleNumber.Text);
-            }
-            layoutSheet.Update();
-            kompasDocument.Save();
-            if (kompasDocument.Changed)
-            {
-                kompasDocument.Close(Kompas6Constants.DocumentCloseOptions.kdDoNotSaveChanges);
-                return false;
-            }
-            kompasDocument.Close(Kompas6Constants.DocumentCloseOptions.kdSaveChanges);
-            return true;
+            application.Quit();
+            progress.Report(100);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -98,7 +108,7 @@ namespace ChangeLayoutStyle
             }
         }
 
-        private void b_change_Click(object sender, RoutedEventArgs e)
+        private async void b_change_Click(object sender, RoutedEventArgs e)
         {
             Log.Clear();
             if (!Directory.Exists(tb_folderDir.Text))
@@ -111,17 +121,12 @@ namespace ChangeLayoutStyle
                 tb_finish.Text = "Путь к файлу оформления не корректен.";
                 return;
             }
-            if (tb_layoutLibraryFileName.Text == "" && tb_LayoutStyleNumber.Text == "")
+            if (tb_layoutLibraryFileName.Text == "" || tb_LayoutStyleNumber.Text == "")
             {
                 tb_finish.Text = "Нет данных для изменения.";
                 return;
             }
-            Type kompasType = Type.GetTypeFromProgID("KOMPAS.Application.5", true);
-            KompasObject kompas = Activator.CreateInstance(kompasType) as KompasObject; //Запуск компаса
-            kompas.Visible = false;
 
-            IApplication application = (IApplication)kompas.ksGetApplication7();
-            IDocuments documets = application.Documents;
             string[] FilesDirs = new string[0];
             if (cb_dirs.IsChecked == true)
             {
@@ -131,22 +136,23 @@ namespace ChangeLayoutStyle
             {
                 FilesDirs = Directory.GetFiles(tb_folderDir.Text, "*.cdw");
             }
-            foreach (string item in FilesDirs)
-            {
-                IKompasDocument kompasDocument = documets.Open(item, false, false);
-                if (!ChangeLayout(kompasDocument))
+            string layoutLibraryFileName = tb_layoutLibraryFileName.Text;
+            string layoutStyleNumber = tb_LayoutStyleNumber.Text;
+            tb_finish.Text = "Началось изменение";
+            var progress = new Progress<int>( value =>
                 {
-                    Log.Add(item);
-                }
-                
-            }
-            application.Quit();
+                    progressbar.Value = value;
+                });
+
+            await Task.Run(() => ChangeLayout(FilesDirs, layoutLibraryFileName, layoutStyleNumber, progress));
+
+
             if (Log.Count == 0)
             {
                 tb_finish.Text = "Готово";
                 return;
             }
-            using (StreamWriter sw = new StreamWriter("Log.txt",false))
+            using (StreamWriter sw = new StreamWriter("Log.txt", false))
             {
                 foreach (var item in Log)
                 {
