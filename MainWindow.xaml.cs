@@ -42,12 +42,18 @@ namespace ChangeLayoutStyle
             if (layoutSheets.Count == 0)
             {
                 tb_finish.Text = "Листов нет";
+                return false;
             }
-            if (layoutSheets.Count > 1)
+            ILayoutSheet layoutSheet = null;
+            foreach (ILayoutSheet item in layoutSheets)
             {
-                tb_finish.Text = "Листов больше одного";
+                layoutSheet = item;
+                break;
             }
-            ILayoutSheet layoutSheet = layoutSheets.ItemByNumber[1];
+            if (layoutSheet == null)
+            {
+                return false;
+            }
             if (tb_layoutLibraryFileName.Text != "")
             {
                 layoutSheet.LayoutLibraryFileName = tb_layoutLibraryFileName.Text;
@@ -111,7 +117,7 @@ namespace ChangeLayoutStyle
                 return;
             }
             Type kompasType = Type.GetTypeFromProgID("KOMPAS.Application.5", true);
-            KompasObject kompas = Activator.CreateInstance(kompasType) as KompasObject;
+            KompasObject kompas = Activator.CreateInstance(kompasType) as KompasObject; //Запуск компаса
             kompas.Visible = false;
 
             IApplication application = (IApplication)kompas.ksGetApplication7();
