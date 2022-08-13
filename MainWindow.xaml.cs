@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -16,6 +17,8 @@ namespace ChangeLayoutStyle
     /// </summary>
     public partial class MainWindow : Window
     {
+        private CancellationTokenSource tokenSource;
+        private CancellationToken token;
         public MainWindow()
         {
             InitializeComponent();
@@ -31,7 +34,7 @@ namespace ChangeLayoutStyle
 
         private List<string> _log = new List<string>();
 
-        private async Task ChangeLayout(string[] FilesDirs, string layoutLibraryFileName, string layoutStyleNumber, IProgress<int> progress)
+        private async Task ChangeLayoutAsync(string[] FilesDirs, string layoutLibraryFileName, string layoutStyleNumber, IProgress<int> progress)
         {
             progress.Report(10);
             Type kompasType = Type.GetTypeFromProgID("KOMPAS.Application.5", true);
@@ -40,6 +43,12 @@ namespace ChangeLayoutStyle
             int progressCount = 20;
             progress.Report(progressCount);
             IApplication application = (IApplication)kompas.ksGetApplication7();
+            if (token.IsCancellationRequested)
+            {
+                application.Quit();
+                progress.Report(0);
+                return;
+            }
             IDocuments documets = application.Documents;
             foreach (string item in FilesDirs)
             {
@@ -78,6 +87,12 @@ namespace ChangeLayoutStyle
                 kompasDocument.Close(Kompas6Constants.DocumentCloseOptions.kdSaveChanges);
                 progressCount += 80 / FilesDirs.Length;
                 progress.Report(progressCount);
+                if (token.IsCancellationRequested)
+                {
+                    application.Quit();
+                    progress.Report(0);
+                    return;
+                }
             }
             application.Quit();
             progress.Report(100);
@@ -110,6 +125,8 @@ namespace ChangeLayoutStyle
 
         private async void b_change_Click(object sender, RoutedEventArgs e)
         {
+            b_Cancel.IsEnabled = true;
+            b_change.IsEnabled = false;
             Log.Clear();
             if (!Directory.Exists(tb_folderDir.Text))
             {
@@ -143,9 +160,16 @@ namespace ChangeLayoutStyle
                 {
                     progressbar.Value = value;
                 });
-
-            await Task.Run(() => ChangeLayout(FilesDirs, layoutLibraryFileName, layoutStyleNumber, progress));
-
+            tokenSource = new CancellationTokenSource();
+            token = tokenSource.Token;
+            await Task.Run(() => ChangeLayoutAsync(FilesDirs, layoutLibraryFileName, layoutStyleNumber, progress), token);
+            b_change.IsEnabled = true;
+            b_Cancel.IsEnabled = false;
+            if (token.IsCancellationRequested)
+            {
+                tb_finish.Text = "Отменено";
+                return;
+            }
 
             if (Log.Count == 0)
             {
@@ -161,6 +185,8 @@ namespace ChangeLayoutStyle
                 sw.Close();
             }
             tb_finish.Text = "Готово. Часть файлов не была изменена, просмотрите журнал.";
+
+
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -184,6 +210,11 @@ namespace ChangeLayoutStyle
                 tb_finish.Text = "Файл журнала не найден.";
             }
             
+        }
+
+        private void b_Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            tokenSource.Cancel();
         }
     }
 }

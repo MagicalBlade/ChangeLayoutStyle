@@ -22,8 +22,11 @@
             <Button x:Name="b_layoutLibraryFileName" Content="Выбрать файл lyt" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_layoutLibraryFileName_Click"/>
             <Label Content = "Номер оформления" Padding="3"  Margin="3" HorizontalAlignment="Center"/>
             <TextBox x:Name="tb_LayoutStyleNumber" Text="1" Padding="3"  Margin="3" Width="80" HorizontalContentAlignment="Center"/>
-            <Button x:Name="b_change" Content="Изменить оформление" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_change_Click"/>
-            <Button x:Name="b_log" Content="Журнал"  Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_log_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="b_change" Content="Изменить оформление" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_change_Click"/>
+                <Button x:Name="b_Cancel" Content="Отмена"  Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_Cancel_Click" IsEnabled="False" />
+                <Button x:Name="b_log" Content="Журнал"  Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_log_Click"/>
+            </StackPanel>
         </StackPanel>
         <ProgressBar x:Name="progressbar" Grid.Row="1"/>
         <StatusBar x:Name="sb_info" Grid.Row="2">
