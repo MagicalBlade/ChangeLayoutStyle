@@ -34,6 +34,14 @@ namespace ChangeLayoutStyle
 
         private List<string> _log = new List<string>();
 
+        /// <summary>
+        /// Асинхронный метод изменения оформления
+        /// </summary>
+        /// <param name="FilesDirs"></param>
+        /// <param name="layoutLibraryFileName"></param>
+        /// <param name="layoutStyleNumber"></param>
+        /// <param name="progress"></param>
+        /// <returns></returns>
         private async Task ChangeLayoutAsync(string[] FilesDirs, string layoutLibraryFileName, string layoutStyleNumber, IProgress<int> progress)
         {
             progress.Report(10);
@@ -97,7 +105,11 @@ namespace ChangeLayoutStyle
             application.Quit();
             progress.Report(100);
         }
-
+        /// <summary>
+        /// Выбор папки с чертежами
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog
@@ -110,7 +122,11 @@ namespace ChangeLayoutStyle
                 tb_folderDir.Text = dialog.FileName;
             }
         }
-
+        /// <summary>
+        /// Выбор файла оформления
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void b_layoutLibraryFileName_Click(object sender, RoutedEventArgs e)
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog
@@ -122,7 +138,11 @@ namespace ChangeLayoutStyle
                 tb_layoutLibraryFileName.Text = dialog.FileName;
             }
         }
-
+        /// <summary>
+        /// Изменение оформления
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void b_change_Click(object sender, RoutedEventArgs e)
         {
             b_Cancel.IsEnabled = true;
@@ -143,7 +163,6 @@ namespace ChangeLayoutStyle
                 tb_finish.Text = "Нет данных для изменения.";
                 return;
             }
-
             string[] FilesDirs = new string[0];
             if (cb_dirs.IsChecked == true)
             {
@@ -153,10 +172,11 @@ namespace ChangeLayoutStyle
             {
                 FilesDirs = Directory.GetFiles(tb_folderDir.Text, "*.cdw");
             }
+            #region Для вызова асинхронного метода изменения оформления
             string layoutLibraryFileName = tb_layoutLibraryFileName.Text;
             string layoutStyleNumber = tb_LayoutStyleNumber.Text;
             tb_finish.Text = "Началось изменение";
-            var progress = new Progress<int>( value =>
+            var progress = new Progress<int>(value =>
                 {
                     progressbar.Value = value;
                 });
@@ -169,13 +189,9 @@ namespace ChangeLayoutStyle
             {
                 tb_finish.Text = "Отменено";
                 return;
-            }
+            } 
+            #endregion
 
-            if (Log.Count == 0)
-            {
-                tb_finish.Text = "Готово";
-                return;
-            }
             using (StreamWriter sw = new StreamWriter("Log.txt", false))
             {
                 foreach (var item in Log)
@@ -184,11 +200,22 @@ namespace ChangeLayoutStyle
                 }
                 sw.Close();
             }
-            tb_finish.Text = "Готово. Часть файлов не была изменена, просмотрите журнал.";
+            if (Log.Count == 0)
+            {
+                tb_finish.Text = "Готово";
+            }
+            else
+            {
+                tb_finish.Text = "Готово. Часть файлов не была изменена, просмотрите журнал.";
+            }
 
 
         }
-
+        /// <summary>
+        /// Закрыть окно и сохранить настройки
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             #region Сохранение настроек
@@ -198,7 +225,11 @@ namespace ChangeLayoutStyle
             Settings.Default.Save();
             #endregion
         }
-
+        /// <summary>
+        /// Открыть файл журнала
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void b_log_Click(object sender, RoutedEventArgs e)
         {
             if (File.Exists("Log.txt"))
@@ -211,7 +242,11 @@ namespace ChangeLayoutStyle
             }
             
         }
-
+        /// <summary>
+        /// Отмена процесса изменения оформления
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void b_Cancel_Click(object sender, RoutedEventArgs e)
         {
             tokenSource.Cancel();
