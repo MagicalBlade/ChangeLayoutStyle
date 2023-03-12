@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChangeLayoutStyle"
         mc:Ignorable="d"
-        Title="Изменить оформление" MinHeight="380" Height="400" Width="370" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
+        Title="Изменить оформление" MinHeight="380" Height="500" Width="370" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -26,6 +26,20 @@
                 <Button x:Name="b_change" Content="Изменить оформление" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_change_Click"/>
                 <Button x:Name="b_Cancel" Content="Отмена"  Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_Cancel_Click" IsEnabled="False" />
                 <Button x:Name="b_log" Content="Журнал"  Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_log_Click"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Content="Номер редакции"/>
+                <TextBox x:Name="tb_NumberRedaction" Text="1" Padding="3"  Margin="3" Width="50" HorizontalContentAlignment="Center"/>
+                <Label Content="Дата редакции"/>
+                <TextBox x:Name="tb_DataRedaction" Padding="3"  Margin="3" Width="50" HorizontalContentAlignment="Center"/>
+                <Button x:Name="b_DataRedaction" Content="Дата" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_DataRedaction_Click"/>
+
+            </StackPanel>
+            <CheckBox x:Name="cb_redactionAuto" Content="Авто номер редакции" HorizontalAlignment="Center" Click="cb_redactionAuto_Click" Checked="cb_redactionAuto_Checked"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="b_Redaction" Content="Создать редакцию" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_Redaction_Click"/>
+                <Button x:Name="b_Redaction_Cancel" Content="Отмена"  Padding="3"  Margin="3" HorizontalAlignment="Center" IsEnabled="False" Click="b_Redaction_Cancel_Click" />
+                <Button x:Name="b_ClearCell" Content="Очистка ячеек" Padding="3"  Margin="3" HorizontalAlignment="Center" Click="b_ClearCell_Click"/>
             </StackPanel>
         </StackPanel>
         <ProgressBar x:Name="progressbar" Grid.Row="1"/>
