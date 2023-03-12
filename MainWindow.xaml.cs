@@ -405,10 +405,20 @@ namespace ChangeLayoutStyle
                 }
                 if (iSAuto == true)
                 {
-                    int numberRedactionInt;
-                    int.TryParse((redaction[redaction.Count -1 ][0]), out numberRedactionInt);
-                    numberRedactionInt += 1;
-                    numberRedaction = numberRedactionInt.ToString();
+                    if (redaction.Count == 0)
+                    {
+                        numberRedaction = "1";
+                    }
+                    else
+                    {
+                        int numberRedactionInt;
+                        if (!int.TryParse(redaction[redaction.Count - 1][0], out numberRedactionInt))
+                        {
+                            Log.Add($"{item} - не корректный номер редакции");
+                        }
+                        numberRedactionInt += 1;
+                        numberRedaction = numberRedactionInt.ToString();
+                    }
                 }
                 redaction.Add(new string[] {numberRedaction, "ред.", dataRedaction});
                 int increment = 0;
@@ -441,7 +451,10 @@ namespace ChangeLayoutStyle
             progress.Report(100);
         }
 
-
+        /// <summary>
+        /// Очистка ячек штампа
+        /// </summary>
+        /// <param name="numberCells"></param>
         private async void b_ClearCell_Click(object sender, RoutedEventArgs e)
         {
             b_Redaction_Cancel.IsEnabled = true;
@@ -480,7 +493,7 @@ namespace ChangeLayoutStyle
             tokenSource = new CancellationTokenSource();
             token = tokenSource.Token;
             await Task.Run(() => ClearStamp(FilesDirs, numberCels, progress), token);
-            b_Redaction.IsEnabled = true;
+            b_ClearCell.IsEnabled = true;
             b_Redaction_Cancel.IsEnabled = false;
             if (token.IsCancellationRequested)
             {
