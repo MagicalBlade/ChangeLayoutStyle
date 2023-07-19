@@ -476,14 +476,15 @@ namespace ChangeLayoutStyle
             {
                 FilesDirs = Directory.GetFiles(tb_folderDir.Text, "*.cdw");
             }
-            #region Для вызова асинхронного метода изменения оформления
+            #region Для вызова асинхронного метода изменения оформления и очистки свойств
             int[] numberCels = new int[]
             {
                 140, 141, 142, 143,
                 150, 151, 152, 153,
                 160, 161, 162, 163,
                 170, 171, 172, 173,
-                180, 181, 182, 183
+                180, 181, 182, 183,
+                16002, 16003
             };
             tb_finish.Text = "Началось изменение";
             var progress = new Progress<int>(value =>
@@ -547,6 +548,29 @@ namespace ChangeLayoutStyle
                     Log.Add($"{item} - Не получилось открыть документ");
                     break;
                 }
+                //Очистка свойст
+                IKompasDocument1 kompasDocument1 = (IKompasDocument1)kompasDocument;
+                kompasDocument1.Author = null;
+                kompasDocument1.Organization = null;
+                IPropertyMng propertyMng = (IPropertyMng)application;
+                object[] properties = propertyMng.GetProperties(null);
+                string[] listpropclear = new string[] { "Наименование", "Комментарий"};
+                foreach (_Property property in properties)
+                {
+                    foreach (string propclear in listpropclear)
+                    {
+                        if (property.Name == propclear)
+                        {
+                            IKompasDocument2D kompasDocument2D = (IKompasDocument2D)kompasDocument;
+                            IPropertyKeeper propertyKeeper = (IPropertyKeeper)kompasDocument2D;
+                            propertyKeeper.SetPropertyValue(property, "", true);
+                            property.Update();
+                        }
+                    }
+                    
+                }
+
+                
 
                 ILayoutSheets layoutSheets = kompasDocument.LayoutSheets;
                 if (layoutSheets.Count == 0)
