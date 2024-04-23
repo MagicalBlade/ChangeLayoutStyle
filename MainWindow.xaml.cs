@@ -484,7 +484,7 @@ namespace ChangeLayoutStyle
                 160, 161, 162, 163,
                 170, 171, 172, 173,
                 180, 181, 182, 183,
-                16002, 16003
+                16001, 16002, 16003
             };
             tb_finish.Text = "Началось изменение";
             var progress = new Progress<int>(value =>
